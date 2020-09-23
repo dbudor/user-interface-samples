@@ -20,9 +20,14 @@
      of "1.9" vs "1.10".  versionName, on the other hand, can be whatever you want, as the code
      that handles upgrading Android apps between versions on your device just ignores it.-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.advancedimmersivemode"
+    android:sharedUserId="android.uid.system"
     android:versionCode="1"
     android:versionName="1.0">
+
+    <uses-permission android:name="android.permission.STATUS_BAR"
+        tools:ignore="ProtectedPermissions" />
 
     <!-- This sample is to demonstrate features released in API 19.
          So while it would technically run on an earlier version of Android,

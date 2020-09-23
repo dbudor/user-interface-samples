@@ -15,6 +15,7 @@
 */
 package com.example.android.advancedimmersivemode;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -25,12 +26,21 @@ import android.widget.CheckBox;
 
 import com.example.android.common.logger.Log;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Demonstrates how to update the app's UI by toggling immersive mode.
  * Checkboxes are also made available for toggling other UI flags which can
  * alter the behavior of immersive mode.
  */
 public class AdvancedImmersiveModeFragment extends Fragment {
+
+    public static final int STATUS_BAR_DISABLE_HOME = 0x00200000;
+    public static final int STATUS_BAR_DISABLE_BACK = 0x00400000;
+    public static final int STATUS_BAR_DISABLE_CLOCK = 0x00800000;
+    public static final int STATUS_BAR_DISABLE_RECENT = 0x01000000;
+    public static final int STATUS_BAR_DISABLE_SEARCH = 0x02000000;
 
     public static final String TAG = "AdvancedImmersiveModeFragment";
     public CheckBox mHideNavCheckbox;
@@ -251,6 +261,41 @@ public class AdvancedImmersiveModeFragment extends Fragment {
         } else {
             newUiOptions &= ~View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         }
+
+
+        @SuppressLint("WrongConstant")
+        Object statusBarService = getContext().getSystemService("statusbar");
+
+        // Use reflection to trigger a method from 'StatusBarManager'
+
+        Class<?> statusBarManager = null;
+
+        try {
+            statusBarManager = Class.forName("android.app.StatusBarManager");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Method disable = null;
+
+        try {
+             disable = statusBarManager.getMethod("disable", int.class);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        disable.setAccessible(true);
+
+        try {
+             disable.invoke(statusBarService, STATUS_BAR_DISABLE_HOME | STATUS_BAR_DISABLE_RECENT);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
         // END_INCLUDE (toggle_immersive_mode_sticky)
 
         // BEGIN_INCLUDE (set_ui_flags)
